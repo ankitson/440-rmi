@@ -27,6 +27,10 @@ public class RMIMessenger {
         inputStream = new BufferedInputStream(socket.getInputStream());
     }
 
+    public RMIMessenger(Socket socket) {
+        this.socket = socket;
+    }
+
     public void sendMessage(RMIMessage message) throws IOException {
         outputStream.writeObject(message);
     }

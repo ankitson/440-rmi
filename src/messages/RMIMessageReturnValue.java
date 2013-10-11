@@ -9,15 +9,22 @@ import messages.RMIMessage;
  * Time: 11:10 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RMIMessageReturnValue<T> extends RMIMessage {
 
-    T returnValue;
+public class RMIMessageReturnValue extends RMIMessage {
 
-    public RMIMessageReturnValue(T returnValue) {
+    Object returnValue;
+    Class returnType;
+
+    public RMIMessageReturnValue(Object returnValue, Class returnType) {
         this.returnValue = returnValue;
+        this.returnType = returnType;
     }
 
-    public T getReturnValue() {
+    public Object getReturnValue() {
         return returnValue;
+    }
+
+    public Class getReturnType() {
+        return returnType;
     }
 }

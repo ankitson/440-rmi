@@ -15,7 +15,10 @@ public class RMIMessageMethodInvocation extends RMIMessage {
 
     private String objectName;
     private String methodName;
-    private Map<String, Object> arguments; //map from argument type (as string) to the argument
+
+    //map from argument type (as string) to the argument
+    //note that argument type strings must be fully-qualified class names
+    private Map<String, Object> arguments;
 
     public RMIMessageMethodInvocation(String objectName, String methodName, Map<String, Object> arguments) {
         this.objectName = objectName;
