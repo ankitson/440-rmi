@@ -1,7 +1,10 @@
 package registry;
 
+import util.Pair;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,21 +13,43 @@ import java.util.Map;
  * Time: 10:23 PM
  * To change this template use File | Settings | File Templates.
  */
+
+/*
+ *
+ *
+ */
 public class RMIRegistry {
 
-    private Map<Integer, RemoteObjectReference> registeredRemoteObjects;
+    private Map<String, Pair<Object, RemoteObjectReference>> registeredObjects;
 
     public RMIRegistry() {
-        registeredRemoteObjects = new HashMap<Integer, RemoteObjectReference>();
+        registeredObjects = new HashMap<String, Pair<Object, RemoteObjectReference>>();
     }
 
     public RemoteObjectReference lookup(String className) {
-        try {
-            Class c = Class.forName(className);
-            Object o = c.newInstance();
-        } catch (ClassNotFoundException e) {
-
+        Pair<Object, RemoteObjectReference> objs = registeredObjects.get(className);
+        if (objs != null) {
+            return objs.getSecond();
         }
+        return null;
+    }
+
+    /**
+     * If a key is already in use, it cannot be overwritten to avoid making
+     * clients RemoteObjectReferences becoming stale.
+     *
+     */
+    public boolean bind(Object obj, String key) {
+        if (registeredObjects.containsKey(key)) {
+            return false;
+        }
+        RemoteObjectReference remoteObj = new RemoteObjectReference(obj);
+        registeredObjects.put(key, new Pair(obj, remoteObj));
+        return true;
+    }
+
+    public Set<String> list() {
+        return registeredObjects.keySet();
     }
 
 }
