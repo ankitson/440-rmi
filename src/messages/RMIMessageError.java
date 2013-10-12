@@ -17,4 +17,8 @@ public class RMIMessageError extends RMIMessage {
     public String getErrorMessage() {
         return errorMessage;
     }
+
+    public String toString() {
+        return errorMessage;
+    }
 }

@@ -11,31 +11,36 @@ import java.net.UnknownHostException;
  * Time: 1:52 AM
  * To change this template use File | Settings | File Templates.
  */
-public class RMIMessenger {
+public class RMIMessenger implements Serializable {
 
     private String hostName;
     private int port;
     private Socket socket;
-    private ObjectOutputStream outputStream;
-    private BufferedInputStream inputStream;
+    public ObjectOutputStream objectOutputStream;
+    private ObjectInputStream objectInputStream;
 
     public RMIMessenger(String hostName, int port) throws UnknownHostException, IOException {
         this.hostName = hostName;
         this.port = port;
         socket = new Socket(hostName, port);
-        outputStream = new ObjectOutputStream(socket.getOutputStream());
-        inputStream = new BufferedInputStream(socket.getInputStream());
+        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        objectInputStream = new ObjectInputStream(socket.getInputStream());
     }
 
-    public RMIMessenger(Socket socket) {
+    public RMIMessenger(Socket socket) throws IOException {
         this.socket = socket;
+        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        objectInputStream = new ObjectInputStream(socket.getInputStream());
     }
 
     public void sendMessage(RMIMessage message) throws IOException {
-        outputStream.writeObject(message);
+        System.out.println("in send message");
+        System.out.println("oos: " + objectOutputStream);
+        System.out.println("message: " + message);
+        objectOutputStream.writeObject(message);
     }
 
-    public File receiveFile(String filePath) throws IOException {
+    /*public File receiveFile(String filePath) throws IOException {
         FileOutputStream fis = new FileOutputStream(filePath);
         int c;
         while ( (c = inputStream.read()) != -1) {
@@ -43,5 +48,10 @@ public class RMIMessenger {
         }
         fis.close();
         return new File(filePath);
+    }*/
+
+    public RMIMessage receiveMessage() throws IOException, ClassNotFoundException {
+        return (RMIMessage) objectInputStream.readObject();
+
     }
 }

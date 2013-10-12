@@ -2,9 +2,11 @@ package registry;
 
 import util.Pair;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,19 +19,22 @@ import java.util.Set;
 
 public class RMIRegistry {
 
-    //change to concurrent map?
-    private Map<String, Pair<Object, RemoteObjectReference>> registeredObjects;
+    private ConcurrentHashMap<String, Pair<Object, RemoteObjectReference>> registeredObjects;
+    public ConcurrentHashMap<String, Pair<Object, RemoteObjectReference>> registeredObjectsInternal;
 
     public RMIRegistry() {
-        registeredObjects = new HashMap<String, Pair<Object, RemoteObjectReference>>();
+        registeredObjects = new ConcurrentHashMap<String, Pair<Object, RemoteObjectReference>>();
+        registeredObjectsInternal = new ConcurrentHashMap<String, Pair<Object, RemoteObjectReference>>();
     }
 
-    public RemoteObjectReference lookup(String className) {
+    public Pair<Object,RemoteObjectReference> clientLookup(String className) {
         Pair<Object, RemoteObjectReference> objs = registeredObjects.get(className);
-        if (objs != null) {
-            return objs.getSecond();
-        }
-        return null;
+        return objs;
+    }
+
+    public Pair<Object,RemoteObjectReference> internalLookup(String className) {
+        Pair<Object, RemoteObjectReference> objs = registeredObjectsInternal.get(className);
+        return objs;
     }
 
     /**
@@ -37,12 +42,13 @@ public class RMIRegistry {
      * clients RemoteObjectReferences becoming stale.
      *
      */
-    public boolean bind(Object obj, String key) {
+    public boolean bind(Object obj, String key) throws IOException {
         if (registeredObjects.containsKey(key)) {
             return false;
         }
-        RemoteObjectReference remoteObj = new RemoteObjectReference(obj);
+        RemoteObjectReference remoteObj = new RemoteObjectReference("RemoteHello", "localhost", 6666, "RemoteHello");
         registeredObjects.put(key, new Pair(obj, remoteObj));
+        registeredObjectsInternal.put(key, new Pair(obj, remoteObj));
         return true;
     }
 
