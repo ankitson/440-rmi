@@ -63,7 +63,7 @@ public class RMIServer {
                     RMIMessageMethodInvocation mmi = (RMIMessageMethodInvocation) received;
                     String objectName = mmi.getObjectName();
                     Object o = rmiRegistry.lookup(objectName).getFirst();
-                    RemoteMethodExecutor rme = new RemoteMethodExecutor(clientSocket, o, mmi);
+                    RemoteMethodEecutor rme = new RemoteMethodEecutor(clientSocket, o, mmi);
                     Thread methodRunner = new Thread(rme);
                     methodRunner.start();
                 } else if (received instanceof RMIMessageLookupRequest) {

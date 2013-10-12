@@ -1,5 +1,7 @@
 package util;
 
+import java.io.Serializable;
+
 /**
  * Created with IntelliJ IDEA.
  * User: ankit
@@ -7,7 +9,7 @@ package util;
  * Time: 1:27 AM
  * To change this template use File | Settings | File Templates.
  */
-public class Pair<A,B> {
+public class Pair<A,B> implements Serializable {
 
     private A first;
     private B second;

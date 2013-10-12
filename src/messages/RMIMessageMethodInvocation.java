@@ -1,6 +1,7 @@
 package messages;
 
 import messages.RMIMessage;
+import util.Pair;
 
 import java.util.Map;
 
@@ -18,9 +19,9 @@ public class RMIMessageMethodInvocation extends RMIMessage {
 
     //map from argument type (as string) to the argument
     //note that argument type strings must be fully-qualified class names
-    private Map<Class, Object> arguments;
+    private Pair<Class[], Object[]> arguments;
 
-    public RMIMessageMethodInvocation(String objectName, String methodName, Map<Class, Object> arguments) {
+    public RMIMessageMethodInvocation(String objectName, String methodName, Pair<Class[], Object[]> arguments) {
         this.objectName = objectName;
         this.methodName = methodName;
         this.arguments = arguments;
@@ -34,7 +35,7 @@ public class RMIMessageMethodInvocation extends RMIMessage {
         return methodName;
     }
 
-    public Map<Class, Object> getArguments() {
+    public Pair<Class[], Object[]> getArguments() {
         return arguments;
     }
 }

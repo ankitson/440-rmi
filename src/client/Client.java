@@ -7,6 +7,8 @@ import messages.RMIMessenger;
 import registry.RemoteObjectReference;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,7 +37,13 @@ public class Client {
         System.out.println("ROR recvd: " + ror.getKey());
         RemoteHelloStub rhs = new RemoteHelloStub(ror, client.messenger);
         try {
-            System.out.println("rhs hello: " + rhs.sayHello("a", "b", 2));
+            List<Float> floats = new ArrayList<Float>();
+            floats.add(3.14f);
+            floats.add(2.15f);
+            System.out.println("rhs hello: " + rhs.sayHello("a", "b", 2, floats));
+            RemoteObjectReference newRHS = rhs.newHello("abc");
+            RemoteHelloStub newRemoteHelloStub = new RemoteHelloStub(newRHS, client.messenger);
+            System.out.println("new stub hello: " + newRemoteHelloStub.sayHello("a", "c", 3, floats));
         } catch (Exception e) {
             System.out.println("exception: " + e);
         }

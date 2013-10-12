@@ -34,21 +34,8 @@ public class RMIMessenger implements Serializable {
     }
 
     public void sendMessage(RMIMessage message) throws IOException {
-        System.out.println("in send message");
-        System.out.println("oos: " + objectOutputStream);
-        System.out.println("message: " + message);
         objectOutputStream.writeObject(message);
     }
-
-    /*public File receiveFile(String filePath) throws IOException {
-        FileOutputStream fis = new FileOutputStream(filePath);
-        int c;
-        while ( (c = inputStream.read()) != -1) {
-            fis.write(c);
-        }
-        fis.close();
-        return new File(filePath);
-    }*/
 
     public RMIMessage receiveMessage() throws IOException, ClassNotFoundException {
         return (RMIMessage) objectInputStream.readObject();
