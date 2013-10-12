@@ -46,7 +46,9 @@ public class RMIRegistry {
         if (registeredObjects.containsKey(key)) {
             return false;
         }
-        RemoteObjectReference remoteObj = new RemoteObjectReference("RemoteHello", "localhost", 6666, "RemoteHello");
+
+        Class intfc = obj.getClass().getInterfaces()[0];
+        RemoteObjectReference remoteObj = new RemoteObjectReference(key, "localhost", 6666, intfc.toString());
         registeredObjects.put(key, new Pair(obj, remoteObj));
         registeredObjectsInternal.put(key, new Pair(obj, remoteObj));
         return true;

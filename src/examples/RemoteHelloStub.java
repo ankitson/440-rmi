@@ -42,7 +42,7 @@ public class RemoteHelloStub implements Serializable {
             if (retVal.getReturnType().equals(String.class)) {
                 return (String) retVal.getReturnValue();
             } else {
-                throw new Exception("Invalid return type. Expected string");
+                throw new Exception("Invalid return type. Expected string, but got: " + retVal.getReturnType());
             }
         } else {
             throw new Exception("Illegal message received invoking method. Message: " + returnValue);
@@ -57,7 +57,5 @@ public class RemoteHelloStub implements Serializable {
         RMIMessageReturnValue retVal = (RMIMessageReturnValue) messenger.receiveMessage();
         RemoteObjectReference newHelloRemote = (RemoteObjectReference) retVal.getReturnValue();
         return newHelloRemote;
-        //RemoteHelloStub newStub = new RemoteHelloStub(newHelloRemote, new RMIMessenger("localhost", 6666));
-        //return newStub;
     }
 }

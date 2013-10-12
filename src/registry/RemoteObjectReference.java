@@ -31,4 +31,8 @@ public class RemoteObjectReference implements Serializable {
         return key;
     }
 
+    public String getRiName() {
+        return riName;
+    }
+
 }

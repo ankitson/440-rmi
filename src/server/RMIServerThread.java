@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,13 +34,18 @@ public class RMIServerThread implements Runnable {
         while (true) {
             try {
                 received = messenger.receiveMessage();
+                System.out.println("received msg: " + received);
                 if (received instanceof RMIMessageMethodInvocation) {
                     RMIMessageMethodInvocation mmi = (RMIMessageMethodInvocation) received;
+                    System.out.println("recvd invocation for " + mmi.getMethodName());
                     String objectName = mmi.getObjectName();
+                    System.out.println("got object name " + objectName);
                     Object o = rmiRegistry.internalLookup(objectName).getFirst();
+                    System.out.println("got object " + o + ". execing method");
                     executeMethod(o, mmi);
                 } else if (received instanceof RMIMessageLookupRequest) {
                     String className = ((RMIMessageLookupRequest) received).getClassName();
+                    System.out.println("recvd lookup for " + className);
                     RemoteObjectReference ror = rmiRegistry.clientLookup(className).getSecond();
                     RMIMessageRemoteObject mro = new RMIMessageRemoteObject(ror);
                     messenger.sendMessage(mro);
@@ -53,13 +59,28 @@ public class RMIServerThread implements Runnable {
         }
     }
 
-    private void executeMethod(Object object, RMIMessageMethodInvocation mmi) {
+    private void executeMethod(Object object, RMIMessageMethodInvocation mmi) throws ClassNotFoundException {
         Pair<Class[],Object[]> argPair = mmi.getArguments();
         Class[] argumentTypes;
         Object[] arguments;
         if (argPair != null) {
             argumentTypes = argPair.getFirst();
             arguments = argPair.getSecond();
+
+            for (int i=0; i<argumentTypes.length;i++) {
+                Class argumentType = argumentTypes[i];
+                if (argumentType.equals(RemoteObjectReference.class)) {
+                    System.out.println("ri name: " + ((RemoteObjectReference)arguments[i]).getRiName());
+                    //argumentType = Class.forName(((RemoteObjectReference)arguments[i]).getRiName());
+
+                    argumentType = Class.forName("examples.RemoteListInterface");
+                    System.out.println("arg type: " + argumentType);
+
+                    arguments[i] = rmiRegistry.internalLookup( ((RemoteObjectReference) arguments[i]).getKey() ).getFirst();
+                }
+                argumentTypes[i] = argumentType;
+
+            }
         } else {
             argumentTypes = null;
             arguments = null;
@@ -68,8 +89,13 @@ public class RMIServerThread implements Runnable {
         RMIMessage retValue = null;
         try {
             Method method = object.getClass().getMethod(mmi.getMethodName(), argumentTypes);
+            System.out.println("constructed method: " + method);
+            System.out.println("arguments: " + Arrays.toString(arguments));
             Object retObj = method.invoke(object, arguments);
             Class retType = method.getReturnType();
+
+            Class intfc = retObj.getClass().getInterfaces()[0];
+
             System.out.println("return type: " + retType);
             if (Remote440.class.isAssignableFrom(retType)) {
                 System.out.println("method returned a remote type. returning ror to client");
@@ -78,7 +104,7 @@ public class RMIServerThread implements Runnable {
                     uniqueKey = UUID.randomUUID().toString();
                 }
 
-                RemoteObjectReference ror = new RemoteObjectReference(uniqueKey, "localhost", 6666, retType.toString());
+                RemoteObjectReference ror = new RemoteObjectReference(uniqueKey, "localhost", 6666, intfc.toString()); //retType.toString());
                 rmiRegistry.registeredObjectsInternal.put(uniqueKey, new Pair(retObj, ror));
 
                 retValue = new RMIMessageReturnValue(ror, RemoteObjectReference.class);

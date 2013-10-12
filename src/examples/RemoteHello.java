@@ -26,7 +26,7 @@ public class RemoteHello extends Remote440 implements Serializable {
     }
 
     public String sayHello(String message2, String message3, Integer num, List<Float> floats) {
-        return message + message2 + message3 + num + floats.toString();
+        return message + "," + message2 + "," + message3 + "," + num + "," + floats.toString();
     }
 
     public RemoteHello newHello(String message2) {
